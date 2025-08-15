@@ -42,15 +42,17 @@ namespace kh {
       }
       public:
       mf_net(int const n): v(n), e() {}
-      void add(int const s, int const t, long const c) {
+      int add(int const s, int const t, long const c) {
         v[s].o.push_back(e.size()), e.emplace_back(t, c);
         v[t].o.push_back(e.size()), e.emplace_back(s, 0);
+        return e.size() - 2;
       }
       long mf(int const s, int const t) {
         long flow(0);
         while (bfs(s, t)) flow += dfs(s, t, LONG_MAX);
         return flow;
       }
+      long flow(size_t const idx) const { return e[idx | 1].cap; }
     };
   }
 }
@@ -58,13 +60,23 @@ namespace kh {
 int main() {
   using namespace std;
   using namespace kh;
-  int n, m, s, t;
-  cin >> n >> m >> s >> t;
-  mf_net net(n + 1);
-  for (int i(1); i <= m; ++i) {
-    int u, v, c;
-    cin >> u >> v >> c;
-    net.add(u, v, c);
+  int nl, nr, m;
+  cin >> nl >> nr >> m;
+  mf_net net(nl + nr + 2);
+  int const s(0), t(nl + nr + 1);
+  auto const idl = [nl, nr] (int const x) { return x; };
+  auto const idr = [nl, nr] (int const x) { return x + nl; };
+  for (int i(1); i <= nl; ++i) net.add(s, idl(i), 1);
+  for (int i(1); i <= nr; ++i) net.add(idr(i), t, 1);
+  vector<tuple<int, int, int>> e(m);
+  for (auto& [v, u, idx]: e) {
+    cin >> v >> u;
+    idx = net.add(idl(v), idr(u), 1);
   }
   cout << net.mf(s, t) << endl;
+  vector<int> ans(nl + 1);
+  for (auto const& [v, u, idx]: e)
+    if (net.flow(idx)) ans[v] = u;
+  for (int i(1); i <= nl; ++i)
+    i == nl ? cout << ans[i] << endl : cout << ans[i] << ' ';
 }
