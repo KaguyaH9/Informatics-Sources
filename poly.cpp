@@ -75,7 +75,7 @@ namespace kh {
         poly dif(int const lg) const { return poly(*this).inplace_dif(lg); }
         poly dit(int const lg) const { return poly(*this).inplace_dit(lg); }
         friend poly operator*(poly const& f, poly const& g) {
-          int const lg(__lg(f.size() + g.size() + 1) + 1);
+          int const lg(__lg(max(f.deg() + g.deg(), 1)) + 1);
           poly const ff(f.dif(lg));
           poly const gg(g.dif(lg));
           poly h(1 << lg);
