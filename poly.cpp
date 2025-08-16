@@ -1,3 +1,5 @@
+// UOJ #34
+
 # include <bits/stdc++.h>
 
 namespace kh {
@@ -35,7 +37,7 @@ namespace kh {
         }
         public:
         poly() = default;
-        explicit poly(int const n): vector(n + 1) {}
+        poly(int const n): vector(n) {}
         poly(initializer_list<int> const init): vector(init) {}
         int deg() const { return int(size()) - 1; }
         int& operator[](int const x) { return vector::operator[](x); }
@@ -70,11 +72,16 @@ namespace kh {
           reverse(next(begin()), end());
           return *this;
         }
-        friend poly operator*(poly f, poly g) {
+        poly dif(int const lg) const { return poly(*this).inplace_dif(lg); }
+        poly dit(int const lg) const { return poly(*this).inplace_dit(lg); }
+        friend poly operator*(poly const& f, poly const& g) {
           int const lg(__lg(f.size() + g.size() + 1) + 1);
-          f.inplace_dif(lg), g.inplace_dif(lg);
-          for (int i(0); i != 1 << lg; ++i) f[i] = 1l * f[i] * g[i] % P;
-          return f.inplace_dit(lg);
+          poly const ff(f.dif(lg));
+          poly const gg(g.dif(lg));
+          poly h(1 << lg);
+          for (int i(0); i != 1 << lg; ++i)
+            h[i] = 1l * ff[i] * gg[i] % P;
+          return h.dit(lg);
         }
       };
     template <int P>
@@ -88,7 +95,8 @@ int main() {
   constexpr int P(998'244'353);
   int n, m;
   cin >> n >> m;
-  poly<P> f(n), g(m);
+  poly<P> f(n + 1);
+  poly<P> g(m + 1);
   for (int i(0); i <= n; ++i) cin >> f[i];
   for (int i(0); i <= m; ++i) cin >> g[i];
   poly<P> const h(f * g);
