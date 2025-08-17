@@ -9,6 +9,10 @@ namespace kh {
       using less_queue = priority_queue<T>;
     template <typename T>
       using greater_queue = priority_queue<T, vector<T>, greater<>>;
+    constexpr auto cmin = [] (auto& a, auto const& b)
+    { return b < a ? a = b, true : false; };
+    constexpr auto cmax = [] (auto& a, auto const& b)
+    { return a < b ? a = b, true : false; };
     class mcmf_net {
       constexpr static long Inf = LONG_MAX >> 1;
       struct node {
@@ -31,10 +35,8 @@ namespace kh {
         auto const relax = [&] (int const x, int const y, int const i) {
           if (!e[i].cap) return;
           long const w(e[i].cost - v[x].hgt + v[y].hgt);
-          if (v[y].dis + w < v[x].dis) {
-            v[x].nxt = i;
-            q.emplace(v[x].dis = v[y].dis + w, x);
-          }
+          if (cmin(v[x].dis, v[y].dis + w))
+            v[x].nxt = i, q.emplace(v[x].dis, x);
         };
         while (!q.empty()) {
           auto const [d, x](q.top()); q.pop();
@@ -45,7 +47,7 @@ namespace kh {
         if (v[s].dis == Inf) return 0;
         long flow(Inf);
         for (int i(s); i != t; i = e[v[i].nxt].head)
-          flow = min(flow, e[v[i].nxt].cap);
+          cmin(flow, e[v[i].nxt].cap);
         for (int i(s); i != t; i = e[v[i].nxt].head) {
           e[v[i].nxt ^ 0].cap -= flow;
           e[v[i].nxt ^ 1].cap += flow;
@@ -74,14 +76,14 @@ namespace kh {
 int main() {
   using namespace std;
   using namespace kh;
-  int n, m;
-  cin >> n >> m;
+  int n, m, s, t;
+  cin >> n >> m >> s >> t;
   mcmf_net net(n + 1);
   for (int i(1); i <= m; ++i) {
     int s, t, c, w;
     cin >> s >> t >> c >> w;
     net.add(s, t, c, w);
   }
-  auto const [flow, cost](net.mcmf(1, n));
+  auto const [flow, cost](net.mcmf(s, t));
   cout << flow << ' ' << cost << endl;
 }
