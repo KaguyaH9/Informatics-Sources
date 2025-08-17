@@ -5,7 +5,7 @@
 namespace kh {
   using namespace std;
   inline namespace src {
-    constexpr long lpow(long x, long n, long const mod) {
+    constexpr long pow(long x, long n, long const mod) {
       long y(1);
       while (n) {
         y = n & 1 ? __int128_t(1) * y * x % mod : y;
@@ -18,7 +18,7 @@ namespace kh {
       if (n == 1) return false;
       long const u(__builtin_ctzl(n - 1));
       long const v((n - 1) >> u);
-      x = lpow(x, v, n);
+      x = pow(x, v, n);
       if (x == 0 || x == 1) return true;
       for (long i(1); i <= u; ++i) {
         if (x == n - 1) return true;
