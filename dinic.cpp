@@ -54,7 +54,7 @@ namespace kh {
         while (bfs(s, t)) flow += dfs(s, t, LONG_MAX);
         return flow;
       }
-      long flow(size_t const idx) const { return e[idx | 1].cap; }
+      long flow(int const idx) const { return e[idx | 1].cap; }
     };
   }
 }
