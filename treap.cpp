@@ -1,4 +1,4 @@
-// LibreOJ #104
+// LibreOJ #107
 
 # include <bits/stdc++.h>
 
@@ -65,7 +65,7 @@ namespace kh {
         return g;
       }
       public:
-      treap(): v(2) { v.back().p = INT_MAX; }
+      treap(): v(2) { v.back().key = INT_MIN, v.back().p = INT_MAX; }
       void add(int const x, int const d) {
         int const g(touch(x));
         if (!(v[g].cnt += d)) v[g].max = v[g].min = v[g].key;
@@ -75,7 +75,7 @@ namespace kh {
       void ins(int const x) { add(x, +1); }
       void era(int const x) { add(x, -1); }
       int rank(int const x) const {
-        int g(1), res(1);
+        int g(1), res(0);
         while (g) {
           res += v[g].key < x ? v[v[g].d[0]].sub : 0;
           res += v[g].key < x ? v[g].cnt : 0;
@@ -108,7 +108,7 @@ namespace kh {
             g = v[g].d[1];
           }
         }
-        return res;
+        return res == INT_MIN ? -1 : res;
       }
       int next(int const x) const {
         int g(1), res(INT_MAX);
@@ -120,7 +120,7 @@ namespace kh {
             g = v[g].d[0];
           }
         }
-        return res;
+        return res == INT_MAX ? -1 : res;
       }
     };
     default_random_engine treap::eng;
@@ -138,12 +138,12 @@ int main() {
     int opt, x;
     cin >> opt >> x;
     switch (opt) {
-      case 1: treap.ins(x); break;
-      case 2: treap.era(x); break;
+      case 0: treap.ins(x); break;
+      case 1: treap.era(x); break;
+      case 2: cout << treap.nth(x) << endl; break;
       case 3: cout << treap.rank(x) << endl; break;
-      case 4: cout << treap.nth(x) << endl; break;
-      case 5: cout << treap.prev(x) << endl; break;
-      case 6: cout << treap.next(x) << endl; break;
+      case 4: cout << treap.prev(x) << endl; break;
+      case 5: cout << treap.next(x) << endl; break;
     }
   }
 }
