@@ -1,5 +1,3 @@
-// UOJ #34
-
 # include <bits/stdc++.h>
 
 namespace kh {
@@ -72,8 +70,30 @@ namespace kh {
           reverse(next(begin()), end());
           return *this;
         }
-        poly dif(int const lg) const { return poly(*this).inplace_dif(lg); }
-        poly dit(int const lg) const { return poly(*this).inplace_dit(lg); }
+        poly& inplace_zeta(int const lg) {
+          assert(size() == size_t(1) << lg);
+          for (int i(1); i != 1 << lg; i <<= 1)
+            for (int j(0); j != 1 << lg; j += i << 1)
+              for (int k(0); k != i; ++k)
+                (at(j | k | i) += at(j | k)) %= P;
+          return *this;
+        }
+        poly& inplace_mobius(int const lg) {
+          assert(size() == size_t(1) << lg);
+          for (int i(1); i != 1 << lg; i <<= 1)
+            for (int j(0); j != 1 << lg; j += i << 1)
+              for (int k(0); k != i; ++k)
+                (at(j | k | i) -= at(j | k)) %= P;
+          return *this;
+        }
+        poly dif(int const lg) const
+        { return poly(*this).inplace_dif(lg); }
+        poly dit(int const lg) const
+        { return poly(*this).inplace_dit(lg); }
+        poly zeta(int const lg) const
+        { return poly(*this).inplace_zeta(lg); }
+        poly mobius(int const lg) const
+        { return poly(*this).inplace_mobius(lg); }
         friend poly operator*(poly const& f, poly const& g) {
           int const lg(__lg(max(f.deg() + g.deg(), 1)) + 1);
           poly const ff(f.dif(lg));
@@ -83,6 +103,25 @@ namespace kh {
             h[i] = 1l * ff[i] * gg[i] % P;
           return h.dit(lg);
         }
+        static poly subset_conf(poly const& f, poly const& g) {
+          if (f.empty() && g.empty()) return poly();
+          int const n(__lg(max(f.deg(), g.deg())) + 1);
+          vector<poly> ff(n + 1, 1 << n);
+          vector<poly> gg(n + 1, 1 << n);
+          for (int i(0); i != 1 << n; ++i) ff[__builtin_popcount(i)][i] = f[i];
+          for (int i(0); i != 1 << n; ++i) gg[__builtin_popcount(i)][i] = g[i];
+          for (poly& f: ff) f.inplace_zeta(n);
+          for (poly& g: gg) g.inplace_zeta(n);
+          vector<poly> hh(n + 1, 1 << n);
+          for (int i(0); i <= n; ++i)
+            for (int j(0); i + j <= n; ++j)
+              for (int k(0); k != 1 << n; ++k)
+                hh[i + j][k] = (hh[i + j][k] + 1l * ff[i][k] * gg[j][k]) % P;
+          for (poly& h: hh) h.inplace_mobius(n);
+          poly h(1 << n);
+          for (int i(0); i != 1 << n; ++i) h[i] = hh[__builtin_popcount(i)][i];
+          return h;
+        }
       };
     template <int P>
       vector<int> poly<P>::w(1, 1);
@@ -90,17 +129,17 @@ namespace kh {
 }
 
 int main() {
-  using namespace std;
   using namespace kh;
-  constexpr int P(998'244'353);
-  int n, m;
-  cin >> n >> m;
-  poly<P> f(n + 1);
-  poly<P> g(m + 1);
-  for (int i(0); i <= n; ++i) cin >> f[i];
-  for (int i(0); i <= m; ++i) cin >> g[i];
-  poly<P> const h(f * g);
-  for (int i(0); i <= n + m; ++i)
-    cout << (h[i] + P) % P << " \n"[i == n + m];
+  constexpr int P(1'000'000'009);
+  typedef poly<P> poly;
+  int n;
+  cin >> n;
+  poly f(1 << n);
+  poly g(1 << n);
+  for (int i(0); i != 1 << n; ++i) cin >> f[i];
+  for (int i(0); i != 1 << n; ++i) cin >> g[i];
+  poly const h(poly::subset_conf(f, g));
+  for (int i(0); i != 1 << n; ++i)
+    cout << (h[i] + P) % P << " \n"[i == (1 << n) - 1];
   cout.flush();
 }

@@ -49,7 +49,7 @@ int main() {
   for (auto i(sa.cbegin()); i != sa.cend(); ++i)
     cout << *i + 1 << " \n"[next(i) == sa.cend()];
   cout.flush();
-  for (auto i(next(ht.cbegin())); i != ht.cend(); ++i)
-    cout << *i << " \n"[next(i) == ht.cend()];
-  cout.flush();
+  // for (auto i(next(ht.cbegin())); i != ht.cend(); ++i)
+  // cout << *i << " \n"[next(i) == ht.cend()];
+  // cout.flush();
 }
