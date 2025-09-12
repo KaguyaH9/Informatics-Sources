@@ -6,7 +6,7 @@ namespace kh {
     class sam {
       struct node {
         int tr[26], len, link;
-        int pre; int nep;
+        bool pre; int nep;
         vector<int> d;
         node(): tr(), len(), link(), pre(), nep(), d() {}
         node(int const len): tr(), len(len), link(), pre(), nep(), d() {}
