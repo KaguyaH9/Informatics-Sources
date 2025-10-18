@@ -1,1 +1,1 @@
-bash -ic "tryrm 'in.txt' 'a.out' 'gmon.out' 'out.txt' 'gen/gen'"
+bash -ic 'tryrm in.txt out.txt gen/gen *.in *.out'
